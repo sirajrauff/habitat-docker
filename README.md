@@ -1,5 +1,5 @@
 # Habitat Docker Container
-Based on [centos/systemd](https://hub.docker.com/r/centos/systemd/), this container aids iterative development of Habitat packages, as well as testing of Supervisors and Rings.
+Based on [centos/systemd](https://hub.docker.com/r/centos/systemd/), this container aids iterative development of Habitat packages, as well as testing of Supervisors and Rings. Available on [Docker Hub](https://hub.docker.com/repository/docker/sirajr/habitat)
 
 ## Start the Container
 Start the container minimally using:
