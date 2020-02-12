@@ -1,0 +1,13 @@
+[Unit]
+Description=Habitat Supervisor
+Documentation=https://habitat.sh
+
+[Service]
+Environment=HAB_LICENSE=accept-no-persist
+ExecStart=/bin/hab sup run --listen-ctl 0.0.0.0:9632
+ExecStop=/bin/hab sup term
+Restart=on-success
+RestartSec=2
+
+[Install]
+WantedBy=default.target
