@@ -11,8 +11,6 @@ RUN curl -s https://raw.githubusercontent.com/habitat-sh/habitat/master/componen
 
 EXPOSE 9631/tcp
 EXPOSE 9632/tcp
-EXPOSE 9638/tcp
-EXPOSE 9638/udp
 
 COPY hab-sup.service /etc/systemd/system/hab-sup.service
 RUN hab pkg install -b core/hab-sup &&\
