@@ -1,17 +1,16 @@
-# Habitat Docker Container
-Based on [centos/systemd](https://hub.docker.com/r/centos/systemd/), this container aids iterative development of Habitat packages, as well as testing of Supervisors and Rings. Available on [Docker Hub](https://hub.docker.com/repository/docker/sirajr/habitat)
+# Habitat Container
+Based on [sirajr/centos-systemd](https://github.com/sirajrauff/centos-systemd-container/), this container aids iterative development of Habitat packages, as well as testing of Supervisors and Rings. Available on [Docker Hub](https://hub.docker.com/repository/docker/sirajr/habitat)
 
 ## Start the Container
 Start the container minimally using:
 ```shell script
-$ docker run -d --cap-add SYS_ADMIN siraj-habitat
+$ podman run -d --name habitat sirajr/habitat
 33d9afdf53a9e9dadb167a732c5a6e4846c598b8ca7572e0a807ee7cd57b9e61
 ```
-Note that the container must be started in detached mode with SYS_ADMIN capabilities due to SystemD requirements (see the centos/systemD page above). 
 
-You can then connect to the container using `docker exec`, where the Supervisor will be installed as a SystemD service `hab-sup`:
+You can then connect to the container using `podman exec`, where the Supervisor will be installed as a SystemD service `hab-sup`:
 ```shell script
-$ docker exec --interactive --tty 33d9afdf53a9 /bin/bash
+$ podman exec --interactive --tty habitat /bin/bash
 ```
 From here you may modify the configuration, install packages/load services, etc.
 
@@ -41,9 +40,9 @@ Feb 12 14:50:55 75f65b0b1da8 hab[19]: hab-sup(MR): Starting http-gateway on 0.0.
 ```
 
 ### The Supervisor API
-To access the Supervisor HTTP API or the Control Gateway, add `-P` to the `docker run` command to expose ports 9631/9632 on TCP on random host ports. You may specify specific ports using `-p <container-port>:[<optional-host-port>]`:
+To access the Supervisor HTTP API or the Control Gateway, add `-P` to the `podman run` command to expose ports 9631/9632 on TCP on random host ports. You may specify specific ports using `-p <container-port>:[<optional-host-port>]`:
 ```shell script
-$ docker run -d --cap-add SYS_ADMIN -p 9631:9631 siraj-habitat
+$ podman run -d -p 9631:9631 siraj-habitat
 
 $ curl --silent localhost:9631/butterfly | jq
 {
@@ -53,15 +52,15 @@ $ curl --silent localhost:9631/butterfly | jq
 ``` 
 
 ### Peering
-To peer multiple containers, we can make use of the default bridge network. To do this, start up multiple containers, then use the `docker inspect` command to retrieve the IP address:
+To peer multiple containers, we can make use of the default bridge network. To do this, start up multiple containers, then use the `podman inspect` command to retrieve the IP address:
 ```shell script
-$ docker run -d --cap-add SYS_ADMIN --name supervisor-1 -p 9631:9631 siraj-habitat
+$ podman run -d --name supervisor-1 -p 9631:9631 siraj-habitat
 bb1094e08831cee0e3377b0774a5d3dc55b2adefd64c1c7e34c1deec7461a53d
 
-$ docker run -d --cap-add SYS_ADMIN --name supervisor-2 siraj-habitat
+$ podman run -d --name supervisor-2 siraj-habitat
 96d630782aaa5e84ce54948d568392fa485f91d2653d98ad9675238f94ccb994"
 
-$ docker inspect supervisor-1 | jq -r '.[0].NetworkSettings.Networks.bridge.IPAddress'
+$ podman inspect supervisor-1 | jq -r '.[0].NetworkSettings.Networks.bridge.IPAddress'
 172.17.0.2
 ```
 This IP address must now be added as a `--peer` argument to the other supervisors using the SystemD unit file at `/etc/systemd/system/hab-sup.service`:
@@ -101,10 +100,10 @@ The container can be useful for testing packages that are deployed in specifical
 
 To make full use of this container's functionality it is suggested to export `HAB_BLDR_URL`,`HAB_AUTH_TOKEN`,`HAB_ORIGIN` and mount the Habitat cache and our project directory to run builds or install packages to test outside the studio:
 ```shell script
-$ docker run --cap-add SYS_ADMIN -d -e HAB_BLDR_URL -e HAB_AUTH_TOKEN -e HAB_ORIGIN --volume ${HOME}/.hab/cache:/hab/cache --volume $(pwd):/workspace siraj-habitat
+$ podman run -d -e HAB_BLDR_URL -e HAB_AUTH_TOKEN -e HAB_ORIGIN --volume ${HOME}/.hab/cache:/hab/cache --volume $(pwd):/workspace siraj-habitat
 917c59943c59
 
-$ docker exec --interactive --tty 917c59943c59 /bin/bash
+$ podman exec --interactive --tty 917c59943c59 /bin/bash
 
 [root@917c59943c59 /]# source /workspace/results/last_build.env
 

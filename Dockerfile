@@ -1,4 +1,4 @@
-FROM centos/systemd
+FROM sirajr/centos-systemd
 LABEL name="habitat"
 
 USER root
@@ -15,5 +15,3 @@ EXPOSE 9632/tcp
 COPY hab-sup.service /etc/systemd/system/hab-sup.service
 RUN hab pkg install -b core/hab-sup &&\
   ln -s /etc/systemd/system/hab-sup.service /lib/systemd/system/default.target.wants/hab-sup.service
-
-ENTRYPOINT ["/usr/sbin/init"]
